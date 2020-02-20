@@ -7,7 +7,14 @@ import org.eclipse.lsp4j.{InitializeParams, InitializedParams}
 import org.eclipse.lsp4j.jsonrpc.Launcher
 
 import scala.concurrent.ExecutionContext
-import scala.meta.internal.metals.{Buffers, GlobalTrace, MetalsLanguageClient, MetalsLanguageServer, MetalsLogger, MetalsServerConfig}
+import scala.meta.internal.metals.{
+  Buffers,
+  GlobalTrace,
+  MetalsLanguageClient,
+  MetalsLanguageServer,
+  MetalsLogger,
+  MetalsServerConfig
+}
 import scala.meta.io.AbsolutePath
 import scala.util.control.NonFatal
 
@@ -69,7 +76,7 @@ object Main {
     //Thread.sleep(10000)
     val didOpen = server.didOpen(CreateParam.makeDidOpen()).get()
     println(didOpen)
-    val dres  =server.definition(CreateParam.makeDefinition()).get()
+    val dres = server.definition(CreateParam.makeDefinition()).get()
     println(dres)
   }
 

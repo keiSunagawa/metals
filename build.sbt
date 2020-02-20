@@ -3,7 +3,6 @@ def isCI = System.getenv("CI") != null
 
 val circeVersion = "0.12.3"
 
-
 def crossSetting[A](
     scalaVersion: String,
     if211: List[A],
@@ -297,13 +296,12 @@ lazy val metals = project
       // for producing SemanticDB from Scala source files
       "org.scalameta" %% "scalameta" % V.scalameta,
       "org.scalameta" % "semanticdb-scalac-core" % V.scalameta cross CrossVersion.full,
-      "io.circe" %% "circe-optics" %"0.13.0"
+      "io.circe" %% "circe-optics" % "0.13.0"
     ) ++ List(
       "io.circe" %% "circe-core",
       "io.circe" %% "circe-generic",
       "io.circe" %% "circe-parser"
-    ).map(_ % circeVersion)
-    ,
+    ).map(_ % circeVersion),
     buildInfoPackage := "scala.meta.internal.metals",
     buildInfoKeys := Seq[BuildInfoKey](
       "localSnapshotVersion" -> localSnapshotVersion,

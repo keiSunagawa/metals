@@ -49,7 +49,7 @@ import org.eclipse.lsp4j.WorkspaceEdit
  * - Aggregates published diagnostics and pretty-prints them as strings
  */
 final class MockClient(workspace: AbsolutePath, buffers: Buffers)
-  extends NoopLanguageClient {
+    extends NoopLanguageClient {
   val diagnostics: TrieMap[AbsolutePath, Seq[Diagnostic]] =
     TrieMap.empty[AbsolutePath, Seq[Diagnostic]]
   val diagnosticsCount: TrieMap[AbsolutePath, AtomicInteger] =
@@ -67,7 +67,7 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
       None
   }
   var showMessageRequestHandler
-  : ShowMessageRequestParams => Option[MessageActionItem] = {
+      : ShowMessageRequestParams => Option[MessageActionItem] = {
     _: ShowMessageRequestParams =>
       None
   }
@@ -76,7 +76,7 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
   var refreshModelHandler: () => Unit = () => {}
 
   override def metalsExecuteClientCommand(
-    params: ExecuteCommandParams
+      params: ExecuteCommandParams
   ): Unit = {
     clientCommands.addLast(params)
     params.getCommand match {
@@ -91,7 +91,7 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
   }
 
   override def applyEdit(
-    params: ApplyWorkspaceEditParams
+      params: ApplyWorkspaceEditParams
   ): CompletableFuture[ApplyWorkspaceEditResponse] = {
     applyWorkspaceEdit(params.getEdit())
     CompletableFuture.completedFuture(new ApplyWorkspaceEditResponse(true))
@@ -102,8 +102,8 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
   }
 
   private def applyEdits(
-    uri: String,
-    textEdits: java.util.List[TextEdit]
+      uri: String,
+      textEdits: java.util.List[TextEdit]
   ): Unit = {
     val path = AbsolutePath.fromAbsoluteUri(URI.create(uri))
 
@@ -149,7 +149,7 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
   }
   private def toPath(filename: String): AbsolutePath =
     workspace.resolve(filename)
-    //TestingServer.toPath(workspace, filename)
+  //TestingServer.toPath(workspace, filename)
   def workspaceMessageRequests: String = {
     messageRequests.asScala.mkString("\n")
   }
@@ -189,7 +189,7 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
   }
 
   override def registerCapability(
-    params: RegistrationParams
+      params: RegistrationParams
   ): CompletableFuture[Void] =
     CompletableFutures.computeAsync { _ =>
       params.getRegistrations.asScala.foreach { registration =>
@@ -220,10 +220,10 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
     showMessages.add(params)
   }
   override def showMessageRequest(
-    params: ShowMessageRequestParams
+      params: ShowMessageRequestParams
   ): CompletableFuture[MessageActionItem] = {
     def isSameMessage(
-      createParams: String => ShowMessageRequestParams
+        createParams: String => ShowMessageRequestParams
     ): Boolean = {
       BuildTools
         .default()
@@ -254,7 +254,7 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
     logMessages.add(params)
   }
   override def metalsSlowTask(
-    params: MetalsSlowTaskParams
+      params: MetalsSlowTaskParams
   ): CompletableFuture[MetalsSlowTaskResult] = {
     CompletableFuture.completedFuture {
       messageRequests.addLast(params.message)
@@ -272,19 +272,19 @@ final class MockClient(workspace: AbsolutePath, buffers: Buffers)
   }
 
   override def metalsInputBox(
-    params: MetalsInputBoxParams
+      params: MetalsInputBoxParams
   ): CompletableFuture[MetalsInputBoxResult] = {
     CompletableFuture.completedFuture(MetalsInputBoxResult(cancelled = true))
   }
 
   override def metalsTreeViewDidChange(
-    params: TreeViewDidChangeParams
+      params: TreeViewDidChangeParams
   ): Unit = {
     treeViewChanges.add(params)
   }
 
   override def metalsPublishDecorations(
-    params: PublishDecorationsParams
+      params: PublishDecorationsParams
   ): Unit = {
     val path = params.uri.toAbsolutePath
     decorations.put(path, params.options)

@@ -19,8 +19,12 @@ object CreateParam {
     val wcroot = root.capabilities.workspace
     set(wcroot.applyEdit.boolean) { wc.setApplyEdit(_) }
     val workspaceEdit = new WorkspaceEditCapabilities()
-    set(wcroot.workspaceEdit.documentChanges.boolean) { workspaceEdit.setDocumentChanges(_) }
-    set(wcroot.workspaceEdit.resourceOperations.each.string) { workspaceEdit.setResourceOperations(_) }
+    set(wcroot.workspaceEdit.documentChanges.boolean) {
+      workspaceEdit.setDocumentChanges(_)
+    }
+    set(wcroot.workspaceEdit.resourceOperations.each.string) {
+      workspaceEdit.setResourceOperations(_)
+    }
     // skip didChangeWatchedFiles
     wc.setWorkspaceEdit(workspaceEdit)
 
@@ -68,19 +72,25 @@ object CreateParam {
   }
 
   def makeDidOpen(): DidOpenTextDocumentParams = {
-    val td= new DidOpenTextDocumentParams()
+    val td = new DidOpenTextDocumentParams()
     val tdRow = new TextDocumentItem()
-    tdRow.setUri("file:///Users/kerfume/gits/Reminder/reminder-backend/server/src/main/scala/me/kerfume/reminder/server/ErrorInfo.scala")
+    tdRow.setUri(
+      "file:///Users/kerfume/gits/Reminder/reminder-backend/server/src/main/scala/me/kerfume/reminder/server/ErrorInfo.scala"
+    )
     tdRow.setLanguageId("scala")
     tdRow.setVersion(0)
-    tdRow.setText("package me.kerfume.reminder.server\n\nimport sttp.model.{StatusCode, Uri}\nimport sttp.tapir.{Codec, CodecFormat, EndpointOutput}\n\nsealed trait ErrorInfo\nobject ErrorInfo {\n  case class BadRequest(msg: String) extends ErrorInfo\n  object BadRequest {\n    implicit val codecPlaneText\n        : Codec[BadRequest, CodecFormat.TextPlain, String] \u003d\n      Codec.stringPlainCodecUtf8.map(BadRequest(_))(_.msg)\n  }\n  case class Redirect(uri: Uri) extends ErrorInfo\n  object Redirect {\n//    implicit val codecPlaneText\n//        : Codec[Redirect, CodecFormat.TextPlain, String] \u003d\n//      Codec.stringPlainCodecUtf8.map(\n//        s \u003d\u003e Redirect(Uri.parse(s).toOption.get) // FIXME unsafe\n//      )(_.uri.toString)\n    // FIXME: frontend: Affjax?redirect??????????????200???, affjax????????????????\n    implicit val codecPlaneText\n        : Codec[Redirect, CodecFormat.TextPlain, String] \u003d\n      Codec.stringPlainCodecUtf8.map(\n        s \u003d\u003e Redirect(Uri.parse(s).toOption.get) // FIXME unsafe\n      )(x \u003d\u003e s\"go redirect: ${x.uri.toString}\")\n  }\n\n  import sttp.tapir._\n\n  def errorInfoOutput: EndpointOutput[ErrorInfo] \u003d\n    oneOf[ErrorInfo](\n      statusMapping(StatusCode.BadRequest, plainBody[BadRequest]),\n//      statusMapping(\n//        StatusCode.MovedPermanently,\n//        header(\"Cache-Control\", \"no-cache\") and header[Redirect](\"Location\")\n//      )\n      // FIXME: frontend: Affjax?redirect??????????????200???, affjax????????????????\n      statusMapping(\n        StatusCode.Ok,\n        header(\"Cache-Control\", \"no-cache\") and plainBody[\n          Redirect\n        ]\n      )\n    )\n}\n")
+    tdRow.setText(
+      "package me.kerfume.reminder.server\n\nimport sttp.model.{StatusCode, Uri}\nimport sttp.tapir.{Codec, CodecFormat, EndpointOutput}\n\nsealed trait ErrorInfo\nobject ErrorInfo {\n  case class BadRequest(msg: String) extends ErrorInfo\n  object BadRequest {\n    implicit val codecPlaneText\n        : Codec[BadRequest, CodecFormat.TextPlain, String] \u003d\n      Codec.stringPlainCodecUtf8.map(BadRequest(_))(_.msg)\n  }\n  case class Redirect(uri: Uri) extends ErrorInfo\n  object Redirect {\n//    implicit val codecPlaneText\n//        : Codec[Redirect, CodecFormat.TextPlain, String] \u003d\n//      Codec.stringPlainCodecUtf8.map(\n//        s \u003d\u003e Redirect(Uri.parse(s).toOption.get) // FIXME unsafe\n//      )(_.uri.toString)\n    // FIXME: frontend: Affjax?redirect??????????????200???, affjax????????????????\n    implicit val codecPlaneText\n        : Codec[Redirect, CodecFormat.TextPlain, String] \u003d\n      Codec.stringPlainCodecUtf8.map(\n        s \u003d\u003e Redirect(Uri.parse(s).toOption.get) // FIXME unsafe\n      )(x \u003d\u003e s\"go redirect: ${x.uri.toString}\")\n  }\n\n  import sttp.tapir._\n\n  def errorInfoOutput: EndpointOutput[ErrorInfo] \u003d\n    oneOf[ErrorInfo](\n      statusMapping(StatusCode.BadRequest, plainBody[BadRequest]),\n//      statusMapping(\n//        StatusCode.MovedPermanently,\n//        header(\"Cache-Control\", \"no-cache\") and header[Redirect](\"Location\")\n//      )\n      // FIXME: frontend: Affjax?redirect??????????????200???, affjax????????????????\n      statusMapping(\n        StatusCode.Ok,\n        header(\"Cache-Control\", \"no-cache\") and plainBody[\n          Redirect\n        ]\n      )\n    )\n}\n"
+    )
     td.setTextDocument(tdRow)
     td
   }
 
   def makeDefinition(): TextDocumentPositionParams = {
-    val td  = new TextDocumentIdentifier()
-    td.setUri("file:///Users/kerfume/gits/Reminder/reminder-backend/server/src/main/scala/me/kerfume/reminder/server/ErrorInfo.scala")
+    val td = new TextDocumentIdentifier()
+    td.setUri(
+      "file:///Users/kerfume/gits/Reminder/reminder-backend/server/src/main/scala/me/kerfume/reminder/server/ErrorInfo.scala"
+    )
     val pos = new Position()
     pos.setLine(6)
     pos.setCharacter(10)

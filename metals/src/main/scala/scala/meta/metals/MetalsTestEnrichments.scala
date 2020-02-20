@@ -42,9 +42,9 @@ object MetalsTestEnrichments {
 
   implicit class XtensionTestLspRange(range: l.Range) {
     def formatMessage(
-      severity: String,
-      message: String,
-      input: m.Input
+        severity: String,
+        message: String,
+        input: m.Input
     ): String = {
       try {
         val start = range.getStart
@@ -82,7 +82,7 @@ object MetalsTestEnrichments {
       case _ => false
     }
     def toPositionParams(
-      identifier: TextDocumentIdentifier
+        identifier: TextDocumentIdentifier
     ): TextDocumentPositionParams = {
       val range = token.pos.toLSP
       val start = range.getStart

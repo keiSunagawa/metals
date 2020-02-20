@@ -525,57 +525,57 @@ class MetalsLanguageServer(
     }).asJava
   }
   def fakeInitialize(
-    params: InitializeParams
+      params: InitializeParams
   ): InitializeResult = {
     println("=== fake initialize...")
 
-      setupJna()
-      initializeParams = Option(params)
-      updateWorkspaceDirectory(params)
-      val capabilities = new ServerCapabilities()
-      capabilities.setExecuteCommandProvider(
-        new ExecuteCommandOptions(
-          ServerCommands.all.map(_.id).asJava
+    setupJna()
+    initializeParams = Option(params)
+    updateWorkspaceDirectory(params)
+    val capabilities = new ServerCapabilities()
+    capabilities.setExecuteCommandProvider(
+      new ExecuteCommandOptions(
+        ServerCommands.all.map(_.id).asJava
+      )
+    )
+    capabilities.setFoldingRangeProvider(true)
+    capabilities.setCodeLensProvider(new CodeLensOptions(false))
+    capabilities.setDefinitionProvider(true)
+    capabilities.setImplementationProvider(true)
+    capabilities.setHoverProvider(true)
+    capabilities.setReferencesProvider(true)
+    val renameOptions = new RenameOptions()
+    renameOptions.setPrepareProvider(true)
+    capabilities.setRenameProvider(renameOptions)
+    capabilities.setDocumentHighlightProvider(true)
+    capabilities.setDocumentOnTypeFormattingProvider(
+      new DocumentOnTypeFormattingOptions("\n")
+    )
+    capabilities.setDocumentRangeFormattingProvider(true)
+    capabilities.setSignatureHelpProvider(
+      new SignatureHelpOptions(List("(", "[").asJava)
+    )
+    capabilities.setCompletionProvider(
+      new CompletionOptions(
+        config.compilers.isCompletionItemResolve,
+        List(".", "*").asJava
+      )
+    )
+    capabilities.setWorkspaceSymbolProvider(true)
+    capabilities.setDocumentSymbolProvider(true)
+    capabilities.setDocumentFormattingProvider(true)
+    if (initializeParams.supportsCodeActionLiterals) {
+      capabilities.setCodeActionProvider(
+        new CodeActionOptions(
+          List(CodeActionKind.QuickFix, CodeActionKind.Refactor).asJava
         )
       )
-      capabilities.setFoldingRangeProvider(true)
-      capabilities.setCodeLensProvider(new CodeLensOptions(false))
-      capabilities.setDefinitionProvider(true)
-      capabilities.setImplementationProvider(true)
-      capabilities.setHoverProvider(true)
-      capabilities.setReferencesProvider(true)
-      val renameOptions = new RenameOptions()
-      renameOptions.setPrepareProvider(true)
-      capabilities.setRenameProvider(renameOptions)
-      capabilities.setDocumentHighlightProvider(true)
-      capabilities.setDocumentOnTypeFormattingProvider(
-        new DocumentOnTypeFormattingOptions("\n")
-      )
-      capabilities.setDocumentRangeFormattingProvider(true)
-      capabilities.setSignatureHelpProvider(
-        new SignatureHelpOptions(List("(", "[").asJava)
-      )
-      capabilities.setCompletionProvider(
-        new CompletionOptions(
-          config.compilers.isCompletionItemResolve,
-          List(".", "*").asJava
-        )
-      )
-      capabilities.setWorkspaceSymbolProvider(true)
-      capabilities.setDocumentSymbolProvider(true)
-      capabilities.setDocumentFormattingProvider(true)
-      if (initializeParams.supportsCodeActionLiterals) {
-        capabilities.setCodeActionProvider(
-          new CodeActionOptions(
-            List(CodeActionKind.QuickFix, CodeActionKind.Refactor).asJava
-          )
-        )
-      } else {
-        capabilities.setCodeActionProvider(true)
-      }
-      capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
-      capabilities.setExperimental(MetalsExperimental())
-      new InitializeResult(capabilities)
+    } else {
+      capabilities.setCodeActionProvider(true)
+    }
+    capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
+    capabilities.setExperimental(MetalsExperimental())
+    new InitializeResult(capabilities)
   }
 
   private def registerNiceToHaveFilePatterns(): Unit = {
@@ -1931,7 +1931,8 @@ class MetalsLanguageServer(
       } yield {
         println("=== occ check ===")
         //println(occ)
-        occ}) match {
+        occ
+      }) match {
         case Some(occ) =>
           if (occ.role.isDefinition && !definitionOnly) {
             println("=== definition check ===")
