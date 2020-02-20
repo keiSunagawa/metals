@@ -1,6 +1,9 @@
 def localSnapshotVersion = "0.8.1-SNAPSHOT"
 def isCI = System.getenv("CI") != null
 
+val circeVersion = "0.12.3"
+
+
 def crossSetting[A](
     scalaVersion: String,
     if211: List[A],
@@ -236,7 +239,7 @@ lazy val mtags = project
 
 lazy val metals = project
   .settings(
-    fork.in(Compile, run) := true,
+    //fork.in(Compile, run) := true,
     mainClass.in(Compile) := Some("scala.meta.metals.Main"),
     // As a general rule of thumb, we try to keep Scala dependencies to a minimum.
     libraryDependencies ++= List(
@@ -293,8 +296,14 @@ lazy val metals = project
       "ch.epfl.scala" %% "bloop-config" % V.bloop,
       // for producing SemanticDB from Scala source files
       "org.scalameta" %% "scalameta" % V.scalameta,
-      "org.scalameta" % "semanticdb-scalac-core" % V.scalameta cross CrossVersion.full
-    ),
+      "org.scalameta" % "semanticdb-scalac-core" % V.scalameta cross CrossVersion.full,
+      "io.circe" %% "circe-optics" %"0.13.0"
+    ) ++ List(
+      "io.circe" %% "circe-core",
+      "io.circe" %% "circe-generic",
+      "io.circe" %% "circe-parser"
+    ).map(_ % circeVersion)
+    ,
     buildInfoPackage := "scala.meta.internal.metals",
     buildInfoKeys := Seq[BuildInfoKey](
       "localSnapshotVersion" -> localSnapshotVersion,

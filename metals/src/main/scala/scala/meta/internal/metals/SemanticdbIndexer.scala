@@ -13,6 +13,7 @@ class SemanticdbIndexer(
 ) {
 
   def onScalacOptions(scalacOptions: ScalacOptionsResult): Unit = {
+    //println(scalacOptions.getItems)
     for (item <- scalacOptions.getItems.asScala) {
       val targetroot = item.targetroot
       onChangeDirectory(targetroot.resolve(Directories.semanticdb).toNIO)
@@ -51,6 +52,7 @@ class SemanticdbIndexer(
   }
 
   def onChange(file: Path): Unit = {
+    //println(file)
     if (!Files.isDirectory(file)) {
       if (file.isSemanticdb) {
         val doc = TextDocuments.parseFrom(Files.readAllBytes(file))

@@ -18,6 +18,7 @@ final class FileSystemSemanticdbs(
 ) extends Semanticdbs {
 
   override def textDocument(file: AbsolutePath): TextDocumentLookup = {
+    println("=== FileSystemSemanticdbs in..")
     if (!file.toLanguage.isScala ||
       file.toNIO.getFileSystem != workspace.toNIO.getFileSystem) {
       TextDocumentLookup.NotFound(file)
@@ -30,6 +31,8 @@ final class FileSystemSemanticdbs(
             charset,
             fingerprints,
             semanticdbRelativePath => {
+              println(semanticdbRelativePath)
+              println(targetroot)
               val semanticdbpath = targetroot.resolve(semanticdbRelativePath)
               if (semanticdbpath.isFile) Some(semanticdbpath)
               else None

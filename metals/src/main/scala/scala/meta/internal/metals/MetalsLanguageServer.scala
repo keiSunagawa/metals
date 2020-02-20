@@ -473,6 +473,7 @@ class MetalsLanguageServer(
   def initialize(
       params: InitializeParams
   ): CompletableFuture[InitializeResult] = {
+    println("=== initialize...")
     timed("initialize")(Future {
       setupJna()
       initializeParams = Option(params)
@@ -522,6 +523,59 @@ class MetalsLanguageServer(
       capabilities.setExperimental(MetalsExperimental())
       new InitializeResult(capabilities)
     }).asJava
+  }
+  def fakeInitialize(
+    params: InitializeParams
+  ): InitializeResult = {
+    println("=== fake initialize...")
+
+      setupJna()
+      initializeParams = Option(params)
+      updateWorkspaceDirectory(params)
+      val capabilities = new ServerCapabilities()
+      capabilities.setExecuteCommandProvider(
+        new ExecuteCommandOptions(
+          ServerCommands.all.map(_.id).asJava
+        )
+      )
+      capabilities.setFoldingRangeProvider(true)
+      capabilities.setCodeLensProvider(new CodeLensOptions(false))
+      capabilities.setDefinitionProvider(true)
+      capabilities.setImplementationProvider(true)
+      capabilities.setHoverProvider(true)
+      capabilities.setReferencesProvider(true)
+      val renameOptions = new RenameOptions()
+      renameOptions.setPrepareProvider(true)
+      capabilities.setRenameProvider(renameOptions)
+      capabilities.setDocumentHighlightProvider(true)
+      capabilities.setDocumentOnTypeFormattingProvider(
+        new DocumentOnTypeFormattingOptions("\n")
+      )
+      capabilities.setDocumentRangeFormattingProvider(true)
+      capabilities.setSignatureHelpProvider(
+        new SignatureHelpOptions(List("(", "[").asJava)
+      )
+      capabilities.setCompletionProvider(
+        new CompletionOptions(
+          config.compilers.isCompletionItemResolve,
+          List(".", "*").asJava
+        )
+      )
+      capabilities.setWorkspaceSymbolProvider(true)
+      capabilities.setDocumentSymbolProvider(true)
+      capabilities.setDocumentFormattingProvider(true)
+      if (initializeParams.supportsCodeActionLiterals) {
+        capabilities.setCodeActionProvider(
+          new CodeActionOptions(
+            List(CodeActionKind.QuickFix, CodeActionKind.Refactor).asJava
+          )
+        )
+      } else {
+        capabilities.setCodeActionProvider(true)
+      }
+      capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
+      capabilities.setExperimental(MetalsExperimental())
+      new InitializeResult(capabilities)
   }
 
   private def registerNiceToHaveFilePatterns(): Unit = {
@@ -907,6 +961,7 @@ class MetalsLanguageServer(
       position: TextDocumentPositionParams
   ): CompletableFuture[util.List[Location]] =
     CancelTokens.future { token =>
+      println("====call defi 1")
       definitionOrReferences(position, token).map(_.locations)
     }
 
@@ -1418,6 +1473,7 @@ class MetalsLanguageServer(
     if (!buildTools.isAutoConnectable) {
       Future.successful(BuildChange.None)
     } else {
+      println("== auto connect ")
       autoConnectToBuildServer()
     }
   }
@@ -1431,6 +1487,7 @@ class MetalsLanguageServer(
       }
       result <- maybeBuild match {
         case Some(build) =>
+          println("== connect new server")
           connectToNewBuildServer(build)
         case None =>
           Future.successful(BuildChange.None)
@@ -1541,11 +1598,13 @@ class MetalsLanguageServer(
       sourceItem: Option[AbsolutePath]
   ): Unit = {
     try {
+      //println(source)
       val reluri = source.toIdeallyRelativeURI(sourceItem)
       val input = source.toInput
       val symbols = ArrayBuffer.empty[WorkspaceSymbolInformation]
       SemanticdbDefinition.foreach(input) {
         case SemanticdbDefinition(info, occ, owner) =>
+          println(s"==SemanticdbDefinition ${occ}")
           if (WorkspaceSymbolProvider.isRelevantKind(info.kind)) {
             occ.range.foreach { range =>
               symbols += WorkspaceSymbolInformation(
@@ -1649,6 +1708,7 @@ class MetalsLanguageServer(
 
   def indexWorkspace(i: ImportedBuild): Unit = {
     timedThunk("updated build targets", config.statistics.isIndex) {
+      println("== indexed..")
       buildTargets.reset()
       interactiveSemanticdbs.reset()
       buildClient.reset()
@@ -1852,10 +1912,13 @@ class MetalsLanguageServer(
       token: CancelToken = EmptyCancelToken,
       definitionOnly: Boolean = false
   ): Future[DefinitionResult] = {
+    println("====call defi 2")
     val source = position.getTextDocument.getUri.toAbsolutePath
     if (source.isScalaFilename) {
+      println(semanticdbs)
       val semanticDBDoc =
         semanticdbs.textDocument(source).documentIncludingStale
+      println(semanticDBDoc)
       (for {
         doc <- semanticDBDoc
         positionOccurrence = definitionProvider.positionOccurrence(
@@ -1863,10 +1926,15 @@ class MetalsLanguageServer(
           position,
           doc
         )
+        //_ = println(positionOccurrence)
         occ <- positionOccurrence.occurrence
-      } yield occ) match {
+      } yield {
+        println("=== occ check ===")
+        //println(occ)
+        occ}) match {
         case Some(occ) =>
           if (occ.role.isDefinition && !definitionOnly) {
+            println("=== definition check ===")
             val referenceContext = new ReferenceContext(false)
             val refParams = new ReferenceParams(referenceContext)
             refParams.setTextDocument(position.getTextDocument())

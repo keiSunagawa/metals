@@ -36,9 +36,11 @@ object Semanticdbs {
     if (scalaPath.toNIO.getFileSystem != sourceroot.toNIO.getFileSystem) {
       TextDocumentLookup.NotFound(scalaPath)
     } else {
+      println("== sclaaPath..")
       val scalaRelativePath = scalaPath.toRelative(sourceroot)
       val semanticdbRelativePath =
         SemanticdbClasspath.fromScala(scalaRelativePath)
+      println(loader(semanticdbRelativePath))
       loader(semanticdbRelativePath) match {
         case None =>
           TextDocumentLookup.NotFound(scalaPath)
